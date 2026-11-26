@@ -152,7 +152,7 @@ edge touches 4 spline weights, as on a real unstructured mesh. The plot is made 
   of cuDNN on the equivalent grid, and ≈1.4× faster than the SpMM path for B ≥ 16.**
 * **Time is still ≈6× behind cuDNN.** The fused kernel runs at ~5 TFLOP/s in fp32 SIMT
   (`benchmarks/profile_fused.py`). The next steps are overlapping the gather with the
-  GEMM and moving the GEMM to tensor cores (see roadmap).
+  GEMM and moving the GEMM to tensor cores.
 
 With 64 channels, memory becomes the deciding factor (16 GB card):
 
@@ -241,24 +241,6 @@ included):
   it halves the memory, which is what lets B = 8 fit on a 16 GB card.
 * The geometry (19 operators, 11.9 M edges) takes 1.4 GB. Each operator only builds the
   sparse layouts its layers use, with int32 indices.
-
-## 5. Roadmap
-
-- [x] fixed-mesh operator, two contraction orders, deterministic backward
-- [x] equivalence tests (PyG, conv2d/3d, conv_transpose2d), smoothness test
-- [x] benchmark against PyG and cuDNN
-- [x] **fused CUDA kernel** (`order="fused"`), forward and backward, deterministic
-- [ ] fused kernel: software pipelining (gather tile `k+1` while multiplying tile `k`)
-- [ ] fused kernel: tensor cores (TF32 / bf16 `mma`), the GEMM part is ~90% of the FLOPs
-- [x] real CFD meshes (CFD-GCN, AirfRANS), same-mesh and mesh-to-mesh layers
-- [ ] fused kernel for resampling layers: transform-first variant (GEMM on the smaller
-      mesh), and splitting the very long rows of high-degree nodes (up to 34k neighbours
-      in AirfRANS 169k → 8k)
-- [x] mesh hierarchy generation and end-to-end U-Net benchmark on a 169k-node mesh
-- [ ] fused kernel at small batch / wide layers (C = 128), where the SpMM path is still faster
-- [ ] 3D meshes
-- [ ] upstream: static-graph support for `SplineConv` in PyG (documented, but currently fails)
-- [ ] other operators whose geometry is fixed (GMMConv, NNConv with fixed edge features)
 
 ## Notes
 
