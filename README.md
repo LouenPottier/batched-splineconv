@@ -76,7 +76,9 @@ backward pass that accumulates `∂W` with atomics edge by edge.
 When the mesh is fixed, `B_s(u_ij)`, `k_s(u_ij)` and `c_i` are **constants**. Collect them
 into one sparse tensor, built once:
 
-$$A[(k,i),\,j] = c_i\!\!\sum_{s\,:\,k_s(u_{ij})=k}\!\! B_s(u_{ij}) \qquad A\in\mathbb R^{K N_{dst}\times N_{src}}$$
+$$
+A[(k,i),j] = c_i \sum_{s : k_s(u_{ij})=k} B_s(u_{ij}), \qquad A \in \mathbb{R}^{K N_{dst} \times N_{src}}
+$$
 
 Then `out = Σ_k A_k X W_k`. If the batch is stored **in the dense columns**,
 `X : [N, B·C_in]`, the whole layer reduces to one SpMM and one GEMM:
